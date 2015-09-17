@@ -8,8 +8,9 @@ public class TileMap {
     private static final int height = 20;
 
     private static final int grass = 1;
-    private static final int water = 3;
+    private static final int water = 5;
     private static final int swamp = 10;
+    private static final int cliff = 1000;
     private int[][] houses;
 
     private int[][] terrain;
@@ -21,11 +22,14 @@ public class TileMap {
     public TileMap() {
         this.terrain = new int[this.width][this.height];
         this.houses = new int[this.width][this.height];
-        fillTiles(0,0,20,20,grass);
+        fillTiles(0,0,width,height,grass);
         fillTiles(3, 3, 4, 2, water);
         fillTiles(0,3,5,2,swamp);
-        placeAHouse(0, 0);
-        placeAHouse(0,5);
+        fillTiles(8,8,10,5, swamp);
+        fillTiles(0,8,8,6, water);
+        fillTiles(6,0,1,3,cliff);
+        placeAHouse(0, 0, 1);
+        placeAHouse(0,5, 2);
     }
 
     /**
@@ -35,14 +39,14 @@ public class TileMap {
      * @param y 
      */
     
-    private void placeAHouse(int x, int y) {
-        this.houses[x][y] = 1;
+    private void placeAHouse(int x, int y, int nro) {
+        this.houses[x][y] = nro;
     }
 
     /**
      * Apumetodi kartan muokkaamiselle. Sijoittaa halutusta
      * koordinaatista lähtien halutun kokoisen palasen valitun
-     * tyyppisen maapalan.
+     * tyyppistä maata.
      * 
      * @param x
      * @param y
@@ -82,14 +86,16 @@ public class TileMap {
         
         for (int j = 0; j < this.height; j++) {
             for (int i = 0; i < this.width; i++) { 
-                if(houses[i][j] == 1){
-                    System.out.print("T");
+                if(houses[i][j] != 0){
+                    System.out.print(houses[i][j]);
                 }
-                else if (terrain[i][j] == 1) {
+                else if (terrain[i][j] == grass) {
                     System.out.print(".");
-                } else if (terrain[i][j] == 3) {
+                } else if (terrain[i][j] == water) {
                     System.out.print("o");
-                } else {
+                } else if (terrain[i][j] == cliff){
+                    System.out.print("^");
+                }else {
                     System.out.print("s");
                 }
             }

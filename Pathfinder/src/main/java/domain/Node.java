@@ -1,6 +1,6 @@
 package domain;
 
-public class Node implements Comparable{
+public class Node implements Comparable<Node>{
 
     private int x;
     private int y;
@@ -102,7 +102,8 @@ public class Node implements Comparable{
         this.cost = cost;
     }
 
-    public int compareTo(Object other) {
+    @Override
+    public int compareTo(Node other) {
         Node n = (Node) other;
         if (cost < n.cost) {
             return -1;

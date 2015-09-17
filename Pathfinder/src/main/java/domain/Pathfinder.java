@@ -5,7 +5,7 @@ import java.util.PriorityQueue;
 public class Pathfinder {
 
     TileMap map;
-    PriorityQueue<Node> open = new PriorityQueue();
+    MinHeap<Node> open = new MinHeap();
     Node[][] nodet;
     Node goal;
     Node start;
@@ -37,7 +37,7 @@ public class Pathfinder {
         nodet[this.start.getX()][this.start.getY()] = this.start;
         while (!open.isEmpty()) {
 
-            current = open.poll();
+            current = (Node)open.pollMin();
             current.setVisited(true);
             if (current.getX() == goal.getX() && current.getY() == goal.getY()) {
                 break;

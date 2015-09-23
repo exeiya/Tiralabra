@@ -7,9 +7,9 @@ public class MinHeap<E extends Comparable<E>> {
     private int size;
 
     public MinHeap() {
-        L = new Object[40];
+        L = new Object[200];
         last = 0;
-        size = 40;
+        size = 200;
     }
 
     /**

@@ -9,6 +9,7 @@ public class Pathfinder {
     Node[][] nodet;
     Node goal;
     Node start;
+    Node maali;
 
     /**
      *
@@ -27,9 +28,23 @@ public class Pathfinder {
                 + Math.abs(start.getY() - this.goal.getY()));
     }
 
+    public Pathfinder(TileMap map) {
+        this.map = map;
+        nodet = new Node[this.map.getWidth()][this.map.getHeight()];
+    }
+
+    public void setPathfinder(Node start, Node goal) {
+        this.start = start;
+        this.goal = goal;
+
+        open.add(this.start);
+        this.start.setCost(Math.abs(start.getX() - this.goal.getX())
+                + Math.abs(start.getY() - this.goal.getY()));
+    }
+
     /**
      * A*-algoritmia soveltava metodi, joka suorittaa varsinaisen polunhaun
-     * 
+     *
      * @return palauttaa matkan kustannuksen aloitusnodesta maaliin.
      */
     public int aStar() {
@@ -37,18 +52,18 @@ public class Pathfinder {
         nodet[this.start.getX()][this.start.getY()] = this.start;
         while (!open.isEmpty()) {
 
-            current = (Node)open.pollMin();
+            current = (Node) open.pollMin();
             current.setVisited(true);
             if (current.getX() == goal.getX() && current.getY() == goal.getY()) {
                 break;
             }
             for (int i = -1; i < 2; i++) {
                 for (int j = -1; j < 2; j++) {
-                    
+
                     if (!isValid(current, i, j)) {
                         continue;
                     }
-                    
+
                     Node naapuri = new Node(current.getX() + i, current.getY() + j, this.map.getType(current.getX() + i, current.getY() + j));
                     int naapuriCost = calcCost(current, naapuri);
 
@@ -71,22 +86,21 @@ public class Pathfinder {
             }
         }
 
-        Node maali = nodet[this.goal.getX()][this.goal.getY()];
+        this.maali = nodet[this.goal.getX()][this.goal.getY()];
 
         return maali.getCost();
     }
 
     /**
-     * Testaa, onko tarkastellun noden naapuri kartan rajojen
-     * sisäpuolella ja sijaitseeko naapuri vain suoraan noden
-     * sivuilla
+     * Testaa, onko tarkastellun noden naapuri kartan rajojen sisäpuolella ja
+     * sijaitseeko naapuri vain suoraan noden sivuilla
+     *
      * @param current tarkasteltu node
      * @param i naapurin x-koordinaatti
      * @param j naapurin y-koordinaatti
-     * @return palauttaa true, jos naapuriin voidaan siirtyä nodesta,
-     *         false, jos naapuriin ei voi siirtyä tarkastellusta nodesta
+     * @return palauttaa true, jos naapuriin voidaan siirtyä nodesta, false, jos
+     * naapuriin ei voi siirtyä tarkastellusta nodesta
      */
-    
     public boolean isValid(Node current, int i, int j) {
         if (i != 0 && j != 0) {
             return false;
@@ -106,13 +120,13 @@ public class Pathfinder {
     }
 
     /**
-     * Laskee nykyisen tarkastellun noden avulla sen naapurin
-     * hinnan, johon kuuluu myös heuristinen arvio
+     * Laskee nykyisen tarkastellun noden avulla sen naapurin hinnan, johon
+     * kuuluu myös heuristinen arvio
+     *
      * @param current tarkasteltu node
      * @param naapuri tarkastellun noden naapuri
      * @return palauttaa naapurin hinnan
      */
-    
     public int calcCost(Node current, Node naapuri) {
         int cost = current.getCost()
                 - Math.abs(current.getX() - this.goal.getX())
@@ -121,6 +135,27 @@ public class Pathfinder {
                 + Math.abs(naapuri.getX() - this.goal.getX())
                 + Math.abs(naapuri.getY() - this.goal.getY());
         return cost;
+    }
+
+    /**
+     * Kulkee polunhakualgoritmissa päätettyä polkua
+     * takaisinpäin niin, että saadaan tieto siitä, mistä polku
+     * menee. Tarvitaan lähinnä kartan piirtämiseen.
+     * @return palauttaa kuljetun polun
+     */
+    public int[][] getPath() {
+        
+        if(this.goal == null || this.start == null){
+            return null;
+        }
+        
+        int[][] path = new int[this.map.getWidth()][this.map.getHeight()];
+        Node current = this.maali;
+        while (current != this.start) {
+            path[current.getX()][current.getY()] = 1;
+            current = current.getParent();
+        }
+        return path;
     }
 
 }

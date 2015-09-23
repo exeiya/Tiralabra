@@ -10,14 +10,12 @@ public class Main {
         
         
         
-        TileMap tm = new TileMap();
-        tm.printMap();
+        //TileMap tm = new TileMap();
         
-        Node start = new Node(0,0);
-        Node goal = new Node(0,5);
-        Pathfinder pf = new Pathfinder(start, goal, tm);
-        int cost = pf.aStar();
-        System.out.println("Polun pituus on " + cost);
+        UI ui = new UI();
+        ui.launch();
+        
+        
         
     }
 }

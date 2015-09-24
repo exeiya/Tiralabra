@@ -28,10 +28,24 @@ public class Pathfinder {
                 + Math.abs(start.getY() - this.goal.getY()));
     }
 
+    /**
+     * Luo uuden pathfinder-olion ja antaa sille käytössä olevan
+     * kartan
+     * @param map kartta, jolla polunetsintä suoritetaan
+     */
+    
     public Pathfinder(TileMap map) {
         this.map = map;
         nodet = new Node[this.map.getWidth()][this.map.getHeight()];
     }
+    
+    /**
+     * Asettaa annetut lähtö- ja maalinodet, joita
+     * käytetään polunhaussa
+     * 
+     * @param start solmu, josta lähdetään liikkeelle
+     * @param goal maalisolmu, johon etsitään polku
+     */
 
     public void setPathfinder(Node start, Node goal) {
         this.start = start;

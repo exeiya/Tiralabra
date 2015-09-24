@@ -8,7 +8,7 @@ public class Node implements Comparable<Node>{
     private Node parent;
     private boolean visited;
     private int cost;
-
+    
     public Node(int x, int y) {
         this.x = x;
         this.y = y;

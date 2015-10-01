@@ -7,9 +7,9 @@ public class MinHeap<E extends Comparable<E>> {
     private int size;
 
     public MinHeap() {
-        L = new Object[200];
+        L = new Object[1000];
         last = 0;
-        size = 200;
+        size = 1000;
     }
 
     /**
@@ -130,7 +130,11 @@ public class MinHeap<E extends Comparable<E>> {
             System.out.print(L[i] + ",");
         }
         System.out.println("");
-        System.out.println("END");
+        //System.out.println("END");
+    }
+    
+    public int getLast(){
+        return last;
     }
 
 }

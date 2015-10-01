@@ -1,4 +1,5 @@
 
+
 import domain.Node;
 import domain.Pathfinder;
 import domain.TileMap;
@@ -8,10 +9,12 @@ public class UI {
 
     TileMap map = new TileMap();
     Pathfinder pathfinder;
+    Pathfinder dijkstra;
     Scanner scanner = new Scanner(System.in);
 
     public UI() {
         this.pathfinder = new Pathfinder(map);
+        this.dijkstra = new Pathfinder(map);
     }
 
     /**
@@ -22,18 +25,33 @@ public class UI {
     
     public void launch() {
 
-        printMap();
+        printMap(pathfinder);
         System.out.println("");
         printInstructions();
         System.out.print("Anna lähtötalon numero: ");
         Node start = askNode();
         System.out.print("Anna maalitalon numero: ");
-         Node goal = askNode();
+        Node goal = askNode();
+        
+         long aikaAlussa = System.currentTimeMillis(); 
          
         pathfinder.setPathfinder(start, goal);
         int cost = pathfinder.aStar();
+        long aikaLopussa = System.currentTimeMillis();  
+        System.out.println("Operaatioon kului aikaa: " + (aikaLopussa - aikaAlussa) + "ms.");  
+       
         System.out.println("Polun pituus on " + cost);
-        printMap();
+        printMap(pathfinder);
+        
+        long aikaAlussa2 = System.currentTimeMillis(); 
+        dijkstra.setPathfinder(start, goal);
+        int cost2 = dijkstra.dijkstra();
+        long aikaLopussa2 = System.currentTimeMillis();  
+         System.out.println("Operaatioon kului aikaa: " + (aikaLopussa2 - aikaAlussa2) + "ms.");  
+        
+        
+        System.out.println("Polun pituus on " + cost2);
+        printMap(dijkstra);
 
     }
 
@@ -65,8 +83,8 @@ public class UI {
      * on olemassa, se merkitään tavallisten merkkien tilalle karttaan.
      */
     
-    public void printMap() {
-        int[][] path = this.pathfinder.getPath();
+    public void printMap(Pathfinder pathfinder) {
+        int[][] path = pathfinder.getPath();
         int[][] houses = this.map.getHouses();
         for (int j = 0; j < this.map.getHeight(); j++) {
             for (int i = 0; i < this.map.getWidth(); i++) {

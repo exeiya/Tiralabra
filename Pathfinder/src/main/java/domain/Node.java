@@ -104,7 +104,7 @@ public class Node implements Comparable<Node>{
 
     @Override
     public int compareTo(Node other) {
-        Node n = (Node) other;
+        Node n = other;
         if (cost < n.cost) {
             return -1;
         } else if (cost > n.cost) {

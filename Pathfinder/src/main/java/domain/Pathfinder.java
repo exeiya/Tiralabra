@@ -13,33 +13,25 @@ public class Pathfinder {
 
     /**
      *
-     * @param start Polunhaun alkupiste
-     * @param goal Kohta, johon etsitään polkua
+     * 
      * @param map Käytössä oleva kartta, jossa liikutaan
      */
-    public Pathfinder(Node start, Node goal, TileMap map) {
-        this.map = map;
-        this.start = start;
-        nodet = new Node[this.map.getWidth()][this.map.getHeight()];
-        open.add(this.start);
-        this.goal = goal;
-
-        this.start.setCost(Math.abs(start.getX() - this.goal.getX())
-                + Math.abs(start.getY() - this.goal.getY()));
-    }
-
     public Pathfinder(TileMap map) {
         this.map = map;
         nodet = new Node[this.map.getWidth()][this.map.getHeight()];
     }
 
+    /**
+     * Asettaa polunhakijalle lähtö- ja maalipisteet
+     * @param start
+     * @param goal 
+     */
+    
     public void setPathfinder(Node start, Node goal) {
         this.start = start;
+         open.add(this.start);
         this.goal = goal;
 
-        open.add(this.start);
-        this.start.setCost(Math.abs(start.getX() - this.goal.getX())
-                + Math.abs(start.getY() - this.goal.getY()));
     }
 
     /**
@@ -48,11 +40,13 @@ public class Pathfinder {
      * @return palauttaa matkan kustannuksen aloitusnodesta maaliin.
      */
     public int aStar() {
+        this.start.setCost(Math.abs(start.getX() - this.goal.getX())
+                + Math.abs(start.getY() - this.goal.getY()));
         Node current;
         nodet[this.start.getX()][this.start.getY()] = this.start;
         while (!open.isEmpty()) {
 
-            current = (Node) open.pollMin();
+            current = (Node)open.pollMin();
             current.setVisited(true);
             if (current.getX() == goal.getX() && current.getY() == goal.getY()) {
                 break;
@@ -66,7 +60,6 @@ public class Pathfinder {
 
                     Node naapuri = new Node(current.getX() + i, current.getY() + j, this.map.getType(current.getX() + i, current.getY() + j));
                     int naapuriCost = calcCost(current, naapuri);
-
                     if (nodet[naapuri.getX()][naapuri.getY()] == null) {
                         naapuri.setParent(current);
                         naapuri.setCost(naapuriCost);
@@ -86,6 +79,52 @@ public class Pathfinder {
             }
         }
 
+        this.maali = nodet[this.goal.getX()][this.goal.getY()];
+
+        return maali.getCost();
+    }
+
+    /**
+     * Dijkstran algoritmi
+     * @return 
+     */
+    
+    public int dijkstra() {
+        this.start.setCost(0);
+        Node current;
+        nodet[this.start.getX()][this.start.getY()] = this.start;
+        while (!open.isEmpty()) {
+            current = (Node) open.pollMin();
+            current.setVisited(true);
+            if (current.getX() == goal.getX() && current.getY() == goal.getY()) {
+                break;
+            }
+            for (int i = -1; i < 2; i++) {
+                for (int j = -1; j < 2; j++) {
+                    if (!isValid(current, i, j)) {
+                        continue;
+                    }
+                    Node naapuri = new Node(current.getX() + i, current.getY() + j, this.map.getType(current.getX() + i, current.getY() + j));
+                    int naapuriCost = current.getCost() + naapuri.getWeight();
+                    if (nodet[naapuri.getX()][naapuri.getY()] == null) {
+                        naapuri.setParent(current);
+                        naapuri.setCost(naapuriCost);
+                        nodet[naapuri.getX()][naapuri.getY()] = naapuri;
+                        open.add(naapuri);
+                    } else if (!nodet[naapuri.getX()][naapuri.getY()].isVisited()) {
+                        if (naapuriCost < nodet[naapuri.getX()][naapuri.getY()].getCost()) {
+                            open.remove(nodet[naapuri.getX()][naapuri.getY()]);
+                            naapuri.setCost(naapuriCost);
+                            naapuri.setParent(current);
+                            open.add(naapuri);
+                            nodet[naapuri.getX()][naapuri.getY()] = naapuri;
+                        }
+
+                    }
+                }
+            }
+
+        }
         this.maali = nodet[this.goal.getX()][this.goal.getY()];
 
         return maali.getCost();
@@ -138,17 +177,18 @@ public class Pathfinder {
     }
 
     /**
-     * Kulkee polunhakualgoritmissa päätettyä polkua
-     * takaisinpäin niin, että saadaan tieto siitä, mistä polku
-     * menee. Tarvitaan lähinnä kartan piirtämiseen.
+     * Kulkee polunhakualgoritmissa päätettyä polkua takaisinpäin niin, että
+     * saadaan tieto siitä, mistä polku menee. Tarvitaan lähinnä kartan
+     * piirtämiseen.
+     *
      * @return palauttaa kuljetun polun
      */
     public int[][] getPath() {
-        
-        if(this.goal == null || this.start == null){
+
+        if (this.goal == null || this.start == null) {
             return null;
         }
-        
+
         int[][] path = new int[this.map.getWidth()][this.map.getHeight()];
         Node current = this.maali;
         while (current != this.start) {

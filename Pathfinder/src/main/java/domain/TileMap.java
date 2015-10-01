@@ -6,7 +6,10 @@ public class TileMap {
 
     private static final int width = 20;
     private static final int height = 15;
-
+    
+    /*private static final int width = 1000;
+    private static final int height = 1000;*/
+    
     public static final int grass = 1;
     public static final int water = 5;
     public static final int swamp = 10;
@@ -23,6 +26,10 @@ public class TileMap {
         this.terrain = new int[this.width][this.height];
         this.houses = new int[this.width][this.height];
         this.houseList = new int[5][2];
+        /*fillTiles(0,0,1000,1000,grass);
+        placeAHouse(0,0,1);
+        placeAHouse(999,999,2);*/
+        
         fillTiles(0,0,width,height,grass);
         fillTiles(3, 3, 4, 2, water);
         fillTiles(0,3,5,2,swamp);

@@ -10,8 +10,6 @@ public class Main {
         
         
         
-        //TileMap tm = new TileMap();
-        
         UI ui = new UI();
         ui.launch();
         

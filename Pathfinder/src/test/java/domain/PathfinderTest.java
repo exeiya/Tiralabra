@@ -36,7 +36,6 @@ public class PathfinderTest {
     public void testAStar() {
         System.out.println("aStar");
         Pathfinder instance = null;
-        instance.aStar();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

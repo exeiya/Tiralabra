@@ -92,13 +92,21 @@ public class MinHeap<E extends Comparable<E>> {
             if (L[i] == element) {
                 L[i] = L[last];
                 last--;
-                if (last != 0){
-                if (compare(L[i], L[(i / 2)]) >= 0) {
-                    heapifyDown(i);
-                } else {
-                    heapifyUp(i);
-                }
-                break;
+                if (last != 0) {
+                    if (i == 1) {
+                        if (compare(L[i], L[(i + 1 / 2)]) >= 0) {
+                            heapifyDown(i);
+                        } else {
+                            heapifyUp(i);
+                        }
+                    } else {
+                        if (compare(L[i], L[(i / 2)]) >= 0) {
+                            heapifyDown(i);
+                        } else {
+                            heapifyUp(i);
+                        }
+                    }
+                    break;
                 }
             }
 
@@ -130,10 +138,9 @@ public class MinHeap<E extends Comparable<E>> {
             System.out.print(L[i] + ",");
         }
         System.out.println("");
-        //System.out.println("END");
     }
-    
-    public int getLast(){
+
+    public int getLast() {
         return last;
     }
 

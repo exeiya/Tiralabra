@@ -1,80 +1,115 @@
 
-
 import domain.Node;
 import domain.Pathfinder;
 import domain.TileMap;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.Scanner;
 
 public class UI {
 
-    TileMap map = new TileMap();
-    Pathfinder pathfinder;
+    TileMap map;
+    Pathfinder astar;
     Pathfinder dijkstra;
     Scanner scanner = new Scanner(System.in);
 
-    public UI() {
-        this.pathfinder = new Pathfinder(map);
-        this.dijkstra = new Pathfinder(map);
-    }
 
     /**
-     * Suorittaa ohjelman pyytämällä käyttäjältä lähtöä ja maalia
-     * ja käyttää polunhakualgoritmia niihin
-     * 
+     * Suorittaa ohjelman pyytämällä käyttäjältä hyväksytyn muotoista karttaa ja tulostaa sen jälkeen
+     * polun pituuden sekä A*-algoritmilla haettuna että Dijkstran algoritmillä
+     *
      */
-    
-    public void launch() {
-
-        printMap(pathfinder);
-        System.out.println("");
+    public void launch() throws Exception {
+        
         printInstructions();
-        System.out.print("Anna lähtötalon numero: ");
-        Node start = askNode();
-        System.out.print("Anna maalitalon numero: ");
-        Node goal = askNode();
-        
-         long aikaAlussa = System.currentTimeMillis(); 
-         
-        pathfinder.setPathfinder(start, goal);
-        int cost = pathfinder.aStar();
-        long aikaLopussa = System.currentTimeMillis();  
-        System.out.println("Operaatioon kului aikaa: " + (aikaLopussa - aikaAlussa) + "ms.");  
-       
-        System.out.println("Polun pituus on " + cost);
-        printMap(pathfinder);
-        
-        long aikaAlussa2 = System.currentTimeMillis(); 
-        dijkstra.setPathfinder(start, goal);
-        int cost2 = dijkstra.dijkstra();
-        long aikaLopussa2 = System.currentTimeMillis();  
-         System.out.println("Operaatioon kului aikaa: " + (aikaLopussa2 - aikaAlussa2) + "ms.");  
-        
-        
-        System.out.println("Polun pituus on " + cost2);
-        printMap(dijkstra);
+        readMap();
+
+        if (checkStartAndGoal()) {
+            Node start = new Node(this.map.houseList[0][0], this.map.houseList[0][1]);
+            Node goal = new Node(this.map.houseList[1][0], this.map.houseList[1][1]);
+
+            System.out.println("start: " + start.getX() + "," + start.getY() + " painaa: " + start.getCost());
+            System.out.println("goal: " + goal.getX() + "," + goal.getY() + " painaa: " + goal.getCost());
+            this.astar = new Pathfinder(this.map);
+
+            this.dijkstra = new Pathfinder(this.map);
+
+            this.map.printMap();
+
+            long aikaAlussa = System.currentTimeMillis();
+            astar.setPathfinder(start, goal, true);
+            int cost = astar.searchPath();
+
+            long aikaLopussa = System.currentTimeMillis();
+            System.out.println("Operaatioon kului aikaa: " + (aikaLopussa - aikaAlussa) + "ms.");
+
+            System.out.println("Polun pituus on " + cost);
+            printMap(astar);
+            long aikaAlussa2 = System.currentTimeMillis();
+            dijkstra.setPathfinder(start, goal, false);
+            int cost2 = dijkstra.searchPath();
+            long aikaLopussa2 = System.currentTimeMillis();
+            System.out.println("Operaatioon kului aikaa: " + (aikaLopussa2 - aikaAlussa2) + "ms.");
+
+            System.out.println("Polun pituus on " + cost2);
+            printMap(dijkstra);
+        }
 
     }
 
+    public boolean checkStartAndGoal() {
+        if (this.map.isStart == 0) {
+            System.out.println("Kartassa ei ole lähtöä!");
+            return false;
+        } else if (this.map.isStart > 1) {
+            System.out.println("Kartassa saa olla vain yksi lähtö!");
+            return false;
+        } else if (this.map.isGoal == 0) {
+            System.out.println("Kartassa ei ole maalia!");
+            return false;
+        } else if (this.map.isGoal > 1) {
+            System.out.println("Kartassa saa olla vain yksi maali!");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     /**
-     * Pyytää käyttäjältä talon numeroa, jota käytetään
-     * houseListasta oikean talon koordinaattien etsimiseen ja 
-     * luo niistä Noden
-     * @return palauttaa luodun Noden
+     * Lukee kartan halutusta tiedostosta polusta src/main/resources/kartannimi.txt
+     * Muodostaa annetuilla tiedoilla TileMapissä kartan riviriviltä.
+     * @throws Exception 
      */
     
-    public Node askNode() {
-        Node n;
-        
-        int nro = -1;
-        while (nro < 1 || nro > 4) {
+    public void readMap() throws Exception {
+        FileReader filereader;
+        BufferedReader reader;
+        System.out.println("Anna kartan leveys: ");
+        int width = Integer.parseInt(scanner.nextLine());
+        System.out.println("Anna kartan pituus: ");
+        int height = Integer.parseInt(scanner.nextLine());
+        this.map = new TileMap(width, height);
+
+        System.out.println("Anna tiedosto: ");
+        String name = "src/main/resources/";
+        while (true) {
             try {
-                nro = Integer.parseInt(scanner.nextLine());
-            } catch (Exception e){
-                System.out.println("Syötä luku 1, 2, 3 tai 4!");
+                String line;
+                line = scanner.nextLine();
+                filereader = new FileReader((name + line));
+            } catch (Exception e) {
+                System.out.println("Tiedostoa ei löydy");
+                continue;
             }
+            reader = new BufferedReader(filereader);
+            int i = 0;
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                this.map.setLine(line, i);
+                i++;
+            }
+            break;
         }
-        n = new Node(map.houseList[nro][0], map.houseList[nro][1]);
-        return n;
+        reader.close();
     }
 
     /**
@@ -82,7 +117,6 @@ public class UI {
      * käytetty, minkäänlaista polkua ei merkata karttaan. Jos polku kuitenkin
      * on olemassa, se merkitään tavallisten merkkien tilalle karttaan.
      */
-    
     public void printMap(Pathfinder pathfinder) {
         int[][] path = pathfinder.getPath();
         int[][] houses = this.map.getHouses();
@@ -90,7 +124,11 @@ public class UI {
             for (int i = 0; i < this.map.getWidth(); i++) {
 
                 if (houses[i][j] != 0) {
-                    System.out.print(houses[i][j]);
+                    if (houses[i][j] == 1) {
+                        System.out.print("S");
+                    } else {
+                        System.out.print("G");
+                    }
                     continue;
                 }
                 if (path != null) {
@@ -99,7 +137,6 @@ public class UI {
                         continue;
                     }
                 }
-
                 if (map.getType(i, j) == map.grass) {
                     System.out.print(".");
                 } else if (map.getType(i, j) == map.water) {
@@ -120,15 +157,15 @@ public class UI {
     /**
      * Tulostaa käyttöohjeet käyttäjälle
      */
-    
     public void printInstructions() {
-        System.out.println("Tulostetulla kartalla näkyvät numerot ovat taloja.");
-        System.out.println("Anna syötteenä ensin sen talon numero, josta halutaan lähteä \n"
-                + "ja sen jälkeen talo, johon halutaan päätyä.\n"
+        System.out.println("Ohjelmalle täytyy antaa tiedosto, josta se lukee kartan. Anna ensin "
+                + "tiedostossa olevan kartan leveys ja korkeus ja sen jälkeen kartta."
+                + "Sijoita karttatiedosto polkuun src/main/resources ja anna ohjelmalle tekstitiedoston nimi."
                 + "Ohjelma antaa tuloksena matkan pituuden ja tulostaa reitin, joka kuljettiin.\n"
                 + "\n"
-                + "Kartalla olevat merkit tarkoittavat seuraavaa:\n"
-                + "Numero --paikalla on talo\n"
+                + "Käytä kartassa vain seuraavia merkkejä (vain yksi lähtö ja maali):\n"
+                + "S --lähtö\n"
+                + "G --maali\n"
                 + ". --ruohoa, kuljettavuus 1\n"
                 + "o --vettä, kuljettavuus 5\n"
                 + "s --suota, kuljettavuus 10\n"

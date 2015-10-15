@@ -13,43 +13,39 @@ public class UI {
     Pathfinder dijkstra;
     Scanner scanner = new Scanner(System.in);
 
-
     /**
-     * Suorittaa ohjelman pyytämällä käyttäjältä hyväksytyn muotoista karttaa ja tulostaa sen jälkeen
-     * polun pituuden sekä A*-algoritmilla haettuna että Dijkstran algoritmillä
+     * Suorittaa ohjelman pyytämällä käyttäjältä hyväksytyn muotoista karttaa ja
+     * tulostaa sen jälkeen polun pituuden sekä A*-algoritmilla haettuna että
+     * Dijkstran algoritmillä
      *
      */
     public void launch() throws Exception {
-        
-        printInstructions();
-        readMap();
 
-        if (checkStartAndGoal()) {
+        printInstructions();
+        boolean mapReady = readMap();
+
+        if (mapReady && checkStartAndGoal()) {
             Node start = new Node(this.map.houseList[0][0], this.map.houseList[0][1]);
             Node goal = new Node(this.map.houseList[1][0], this.map.houseList[1][1]);
 
-            System.out.println("start: " + start.getX() + "," + start.getY() + " painaa: " + start.getCost());
-            System.out.println("goal: " + goal.getX() + "," + goal.getY() + " painaa: " + goal.getCost());
             this.astar = new Pathfinder(this.map);
 
             this.dijkstra = new Pathfinder(this.map);
 
+            System.out.println("KARTTA:");
             this.map.printMap();
-
-            long aikaAlussa = System.currentTimeMillis();
+            System.out.println("\n"
+                    + "  ---- A*");
             astar.setPathfinder(start, goal, true);
             int cost = astar.searchPath();
 
-            long aikaLopussa = System.currentTimeMillis();
-            System.out.println("Operaatioon kului aikaa: " + (aikaLopussa - aikaAlussa) + "ms.");
-
             System.out.println("Polun pituus on " + cost);
             printMap(astar);
-            long aikaAlussa2 = System.currentTimeMillis();
+            
+            System.out.println("\n"
+                    + "  ---- Dijkstra");
             dijkstra.setPathfinder(start, goal, false);
             int cost2 = dijkstra.searchPath();
-            long aikaLopussa2 = System.currentTimeMillis();
-            System.out.println("Operaatioon kului aikaa: " + (aikaLopussa2 - aikaAlussa2) + "ms.");
 
             System.out.println("Polun pituus on " + cost2);
             printMap(dijkstra);
@@ -76,19 +72,15 @@ public class UI {
     }
 
     /**
-     * Lukee kartan halutusta tiedostosta polusta src/main/resources/kartannimi.txt
-     * Muodostaa annetuilla tiedoilla TileMapissä kartan riviriviltä.
-     * @throws Exception 
+     * Lukee kartan halutusta tiedostosta polusta
+     * src/main/resources/kartannimi.txt Muodostaa annetuilla tiedoilla
+     * TileMapissä kartan riviriviltä.
+     *
+     * @throws Exception
      */
-    
-    public void readMap() throws Exception {
+    public boolean readMap() throws Exception {
         FileReader filereader;
         BufferedReader reader;
-        System.out.println("Anna kartan leveys: ");
-        int width = Integer.parseInt(scanner.nextLine());
-        System.out.println("Anna kartan pituus: ");
-        int height = Integer.parseInt(scanner.nextLine());
-        this.map = new TileMap(width, height);
 
         System.out.println("Anna tiedosto: ");
         String name = "src/main/resources/";
@@ -102,6 +94,17 @@ public class UI {
                 continue;
             }
             reader = new BufferedReader(filereader);
+            int width = -1;
+            int height = -1;
+            try {
+                width = Integer.parseInt(reader.readLine());
+                height = Integer.parseInt(reader.readLine());
+            } catch (Exception e) {
+                System.out.println("Kartan leveyttä ja korkeutta ei saatu määritettyä! "
+                        + "Sijoititko tiedoston ensimmäiselle riville leveyden ja toiselle korkeuden?");
+                return false;
+            }
+            this.map = new TileMap(width, height);
             int i = 0;
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 this.map.setLine(line, i);
@@ -110,6 +113,7 @@ public class UI {
             break;
         }
         reader.close();
+        return true;
     }
 
     /**
@@ -158,10 +162,10 @@ public class UI {
      * Tulostaa käyttöohjeet käyttäjälle
      */
     public void printInstructions() {
-        System.out.println("Ohjelmalle täytyy antaa tiedosto, josta se lukee kartan. Anna ensin "
-                + "tiedostossa olevan kartan leveys ja korkeus ja sen jälkeen kartta."
+        System.out.println("Ohjelmalle täytyy antaa tiedosto, josta se lukee kartan. "
                 + "Sijoita karttatiedosto polkuun src/main/resources ja anna ohjelmalle tekstitiedoston nimi."
                 + "Ohjelma antaa tuloksena matkan pituuden ja tulostaa reitin, joka kuljettiin.\n"
+                + "Sijoita karttatiedoston ensimmäiselle riville kartan leveys ja toiselle riville korkeus"
                 + "\n"
                 + "Käytä kartassa vain seuraavia merkkejä (vain yksi lähtö ja maali):\n"
                 + "S --lähtö\n"

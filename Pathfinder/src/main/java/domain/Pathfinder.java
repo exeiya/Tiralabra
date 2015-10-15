@@ -99,7 +99,6 @@ public class Pathfinder {
         }
 
         this.maali = nodet[this.goal.getX()][this.goal.getY()];
-        System.out.println("maali:  " + this.maali.getX() +","+this.maali.getY());
         return maali.getCost();
     }
 

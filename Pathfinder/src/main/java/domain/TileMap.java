@@ -12,8 +12,6 @@ public class TileMap {
     public static final int water = 5;
     public static final int swamp = 10;
     public static final int cliff = 1000;
-    public static final int start = 1;
-    public static final int goal = 1;
     public int[][] houseList = new int[2][2];
     public int[][] houses;
     public int isStart = 0;
@@ -37,16 +35,18 @@ public class TileMap {
      * @param s annettu tieto merkkijonona
      * @param line tietojen rivi
      */
-    public void setLine(String s, int line){
+    public boolean setLine(String s, int line){
+        if(s.length() > width) return false;
+        if(line >= height) return false;
         for(int i = 0; i < s.length(); i++){
             if(s.charAt(i) == 'S'){
-                terrain[i][line] = this.start;
+                terrain[i][line] = this.grass;
                 isStart++;
                 houseList[0][0] = i;
                 houseList[0][1] = line;
                 houses[i][line] = 1;
             } else if (s.charAt(i) == 'G'){
-                terrain[i][line] = this.goal;
+                terrain[i][line] = this.grass;
                 isGoal++;
                 houseList[1][0] = i;
                 houseList[1][1] = line;
@@ -64,27 +64,9 @@ public class TileMap {
             }
                     
         }
+        return true;
     }
 
-    /**
-     * Apumetodi kartan muokkaamiselle. Sijoittaa halutusta
-     * koordinaatista lähtien halutun kokoisen palasen valitun
-     * tyyppistä maata.
-     * 
-     * @param x
-     * @param y
-     * @param width
-     * @param height
-     * @param type 
-     */
-    
-    private void fillTiles(int x, int y, int width, int height, int type) {
-        for (int j = y; j < y + height; j++) {
-            for (int i = x; i < x + width; i++) {
-                terrain[i][j] = type;
-            }
-        }
-    }
 
     /**
      * @return the width

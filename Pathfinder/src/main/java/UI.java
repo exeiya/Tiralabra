@@ -1,4 +1,6 @@
 
+
+
 import domain.Node;
 import domain.Pathfinder;
 import domain.TileMap;
@@ -22,9 +24,8 @@ public class UI {
     public void launch() throws Exception {
 
         printInstructions();
-        boolean mapReady = readMap();
 
-        if (mapReady && checkStartAndGoal()) {
+        if (readMap() && checkStartAndGoal()) {
             Node start = new Node(this.map.houseList[0][0], this.map.houseList[0][1]);
             Node goal = new Node(this.map.houseList[1][0], this.map.houseList[1][1]);
 
@@ -53,6 +54,12 @@ public class UI {
 
     }
 
+    /**
+     * Tarkistaa, onko kartassa yksi maali ja yksi lähtö
+     * @return true, jos yksi lähtö ja maali
+     *         false, jos lähtöjä tai maaleja väärä määrä
+     */
+    
     public boolean checkStartAndGoal() {
         if (this.map.isStart == 0) {
             System.out.println("Kartassa ei ole lähtöä!");
@@ -75,7 +82,8 @@ public class UI {
      * Lukee kartan halutusta tiedostosta polusta
      * src/main/resources/kartannimi.txt Muodostaa annetuilla tiedoilla
      * TileMapissä kartan riviriviltä.
-     *
+     * @return true, jos kartan luku onnistuu
+     *         false, kartan luku ei onnistunut
      * @throws Exception
      */
     public boolean readMap() throws Exception {
@@ -90,7 +98,7 @@ public class UI {
                 line = scanner.nextLine();
                 filereader = new FileReader((name + line));
             } catch (Exception e) {
-                System.out.println("Tiedostoa ei löydy");
+                System.out.println("Tiedostoa ei löydy, anna uusi tiedosto:");
                 continue;
             }
             reader = new BufferedReader(filereader);
@@ -100,15 +108,20 @@ public class UI {
                 width = Integer.parseInt(reader.readLine());
                 height = Integer.parseInt(reader.readLine());
             } catch (Exception e) {
-                System.out.println("Kartan leveyttä ja korkeutta ei saatu määritettyä! "
-                        + "Sijoititko tiedoston ensimmäiselle riville leveyden ja toiselle korkeuden?");
+                System.out.println("Kartan leveyttä ja korkeutta ei saatu määritettyä! \n"
+                        + "Sijoititko tiedoston ensimmäiselle riville leveyden ja toiselle korkeuden?\n");
                 return false;
             }
             this.map = new TileMap(width, height);
-            int i = 0;
-            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                this.map.setLine(line, i);
-                i++;
+            int line = 0;
+            for (String s = reader.readLine(); s != null; s = reader.readLine()) {
+                boolean arvo = this.map.setLine(s, line);
+                if(!arvo){
+                    System.out.println("Kartan leveys/korkeus ei vastaa tiedostossa annettuja tietoja!\n"
+                            + "Tarkista karttatiedosto ja yritä uudelleen.\n");
+                    return false;
+                }
+                line++;
             }
             break;
         }
@@ -162,10 +175,10 @@ public class UI {
      * Tulostaa käyttöohjeet käyttäjälle
      */
     public void printInstructions() {
-        System.out.println("Ohjelmalle täytyy antaa tiedosto, josta se lukee kartan. "
-                + "Sijoita karttatiedosto polkuun src/main/resources ja anna ohjelmalle tekstitiedoston nimi."
+        System.out.println("Ohjelmalle täytyy antaa tiedosto, josta se lukee kartan. \n"
+                + "Sijoita karttatiedosto polkuun src/main/resources ja anna ohjelmalle tekstitiedoston nimi.\n"
                 + "Ohjelma antaa tuloksena matkan pituuden ja tulostaa reitin, joka kuljettiin.\n"
-                + "Sijoita karttatiedoston ensimmäiselle riville kartan leveys ja toiselle riville korkeus"
+                + "Sijoita karttatiedoston ensimmäiselle riville kartan leveys ja toiselle riville korkeus\n"
                 + "\n"
                 + "Käytä kartassa vain seuraavia merkkejä (vain yksi lähtö ja maali):\n"
                 + "S --lähtö\n"
